@@ -1,3 +1,4 @@
+import { summarize } from '../summary.js';
 import type { RepoBeacon } from '../types.js';
 
 function escapeHtml(value: string): string {
@@ -11,6 +12,7 @@ function statusClass(repo: RepoBeacon): string {
 }
 
 export function renderHtml(repos: RepoBeacon[]): string {
+  const summary = summarize(repos);
   const rows = repos.map((repo) => `<tr class="${statusClass(repo)}"><td>${escapeHtml(repo.name)}</td><td>${escapeHtml(repo.branch)}</td><td>${repo.dirty ? 'dirty' : 'clean'}</td><td>${repo.ahead}/${repo.behind}</td><td>${repo.worktreeCount}</td><td>${repo.github?.ci ?? 'n/a'}</td><td>${repo.github?.openIssues ?? 'n/a'}</td><td>${escapeHtml(repo.github?.latestRelease ?? 'n/a')}</td><td>${escapeHtml(repo.lastCommit)}</td></tr>`).join('\n');
   return `<!doctype html>
 <html lang="en">
@@ -23,7 +25,7 @@ export function renderHtml(repos: RepoBeacon[]): string {
 <main>
 <h1>repobeacon</h1>
 <p class="tagline">A local-first lighthouse sweep over ${repos.length} repositories.</p>
-<section class="cards"><div class="card"><span>Dirty</span><br><strong>${repos.filter((repo) => repo.dirty).length}</strong></div><div class="card"><span>Behind</span><br><strong>${repos.filter((repo) => repo.behind > 0).length}</strong></div><div class="card"><span>CI failing</span><br><strong>${repos.filter((repo) => repo.github?.ci === 'failing').length}</strong></div></section>
+<section class="cards"><div class="card"><span>Dirty</span><br><strong>${summary.dirty}</strong></div><div class="card"><span>Behind</span><br><strong>${summary.behind}</strong></div><div class="card"><span>CI failing</span><br><strong>${summary.ciFailing}</strong></div></section>
 <table><thead><tr><th>Repo</th><th>Branch</th><th>State</th><th>A/B</th><th>Worktrees</th><th>CI</th><th>Issues</th><th>Release</th><th>Last commit</th></tr></thead><tbody>${rows}</tbody></table>
 <footer>Generated locally. No network calls, no auto-sync.</footer>
 </main>
