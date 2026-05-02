@@ -1,20 +1,47 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { renderHtml, renderJson, renderTable } from '../src/renderers/index.js';
-import type { RepoBeacon } from '../src/types.js';
+import { renderTable } from '../src/renderers/table.js';
+import { renderJson } from '../src/renderers/json.js';
+import { renderHtml } from '../src/renderers/html.js';
+import type { RepoRecord } from '../src/types.js';
 
-const repo: RepoBeacon = { name: 'clean-repo', path: '/tmp/clean-repo', branch: 'main', dirty: false, ahead: 1, behind: 0, lastCommit: 'abc initial', lastCommitDate: '2026-01-01T00:00:00Z', worktreeCount: 1, github: { ci: 'passing', openIssues: 2, latestRelease: 'v1.0.0' } };
+const repos: RepoRecord[] = [{
+  name: 'alpha-app',
+  path: '/tmp/alpha-app',
+  branch: 'main',
+  dirty: false,
+  ahead: 1,
+  behind: 0,
+  worktreeCount: 2,
+  lastCommitSha: 'abc123',
+  lastCommitDate: '2026-05-01T00:00:00Z',
+  lastCommitRelativeDays: 1,
+  beaconStatus: 'passing',
+  healthScore: 91,
+  github: {
+    repo: 'alpha-app',
+    ci: { status: 'passing' },
+    issues: { open: 2 },
+    release: { latestTag: 'v1.0.0', publishedAt: '2026-04-20T00:00:00Z' }
+  }
+}];
 
-test('renders terminal table', () => {
-  assert.match(renderTable([repo]), /clean-repo/);
+test('table renderer includes the key columns', () => {
+  const table = renderTable(repos);
+  assert.match(table, /alpha-app/);
+  assert.match(table, /ahead\/behind/);
+  assert.match(table, /91/);
 });
 
-test('renders json with summary', () => {
-  const parsed = JSON.parse(renderJson([repo]));
-  assert.equal(parsed.summary.total, 1);
+test('json renderer emits repoCount and repos', () => {
+  const parsed = JSON.parse(renderJson(repos));
+  assert.equal(parsed.repoCount, 1);
+  assert.equal(parsed.repos[0].name, 'alpha-app');
 });
 
-test('renders static html dashboard', () => {
-  assert.match(renderHtml([repo]), /<!doctype html>/);
-  assert.match(renderHtml([repo]), /No network calls/);
+test('html renderer creates a branded dashboard', () => {
+  const html = renderHtml(repos, 'Beacon Board');
+  assert.match(html, /Beacon Board/);
+  assert.match(html, /Strongest beacon/);
+  assert.match(html, /alpha-app/);
 });

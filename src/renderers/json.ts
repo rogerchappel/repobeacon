@@ -1,6 +1,9 @@
-import { summarize } from '../summary.js';
-import type { RepoBeacon } from '../types.js';
+import type { RepoRecord } from '../types.js';
 
-export function renderJson(repos: RepoBeacon[]): string {
-  return JSON.stringify({ generatedAt: new Date().toISOString(), summary: summarize(repos), repos }, null, 2);
+export function renderJson(repos: RepoRecord[]): string {
+  return JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    repoCount: repos.length,
+    repos
+  }, null, 2);
 }

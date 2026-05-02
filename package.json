@@ -1,1 +1,47 @@
-{"name":"repobeacon","version":"0.1.0","description":"Local-first repo radar for many small OSS projects.","type":"module","bin":{"repobeacon":"./dist/src/cli.js"},"files":["dist","README.md","docs"],"scripts":{"build":"tsc","check":"tsc --noEmit","test":"node --test dist/**/*.test.js","smoke":"bash scripts/smoke.sh","prepack":"npm run build"},"keywords":["git","dashboard","cli","tui","static-site","local-first"],"author":"Roger Chappel","license":"MIT","engines":{"node":">=20"},"dependencies":{"commander":"^12.1.0"},"devDependencies":{"@types/node":"^22.10.2","typescript":"^5.7.2"}}
+{
+  "name": "repobeacon",
+  "version": "0.1.0",
+  "description": "Terminal-first repo radar for local git state, fixture-backed GitHub health, and static dashboards.",
+  "type": "module",
+  "bin": {
+    "repobeacon": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test tests/**/*.test.ts",
+    "smoke": "tsx scripts/smoke.ts"
+  },
+  "keywords": [
+    "git",
+    "github",
+    "dashboard",
+    "terminal",
+    "oss",
+    "maintainer"
+  ],
+  "author": "Roger Chappel",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rogerchappel/repobeacon.git"
+  },
+  "homepage": "https://github.com/rogerchappel/repobeacon",
+  "bugs": {
+    "url": "https://github.com/rogerchappel/repobeacon/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

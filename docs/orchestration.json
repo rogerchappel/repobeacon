@@ -1,18 +1,29 @@
 {
   "project": "repobeacon",
-  "mode": "direct-build",
-  "workstreams": [
-    "foundation",
-    "git-scan",
-    "fixture-metadata",
-    "renderers",
-    "quality",
-    "publish"
+  "repository": "rogerchappel/repobeacon",
+  "defaultBranch": "main",
+  "strategy": "single-worktree-mvp",
+  "constraints": [
+    "isolated worktree only",
+    "local-first default",
+    "fixture-backed GitHub metadata",
+    "no live OAuth in v0.1",
+    "no auto-sync or auto-pull by default"
   ],
-  "safety": {
-    "hiddenNetwork": false,
-    "autoSync": false,
-    "writesToRepos": false,
-    "outputWritesRequireFlag": true
-  }
+  "deliverables": [
+    "CLI scan command",
+    "table/json/html renderers",
+    "fixture-backed tests",
+    "smoke script",
+    "release docs"
+  ],
+  "verification": [
+    "npm test",
+    "npm run check",
+    "npm run build",
+    "npm run smoke",
+    "bash scripts/validate.sh",
+    "npm pack --dry-run",
+    "real built CLI smoke"
+  ]
 }

@@ -1,49 +1,88 @@
 # repobeacon
 
-**repobeacon** is a local-first CLI radar for many small open-source repositories. It scans a projects folder, reads Git state, optionally merges fixture-backed GitHub metadata, and renders a terminal table, JSON, or a static HTML dashboard.
+`repobeacon` is a terminal-first repo radar for people juggling lots of small repositories.
+It scans local git repos, blends in fixture-backed GitHub health, and can emit a static HTML dashboard for a profile page or weekly maintenance ritual.
 
-It is inspired by the category represented by `steipete/RepoBar`, but it is not a menu-bar app and does not copy RepoBar's name, UI, screenshots, docs, code, or implementation. repobeacon is an original terminal/static-dashboard tool built for batch maintenance workflows.
+Inspired by the repo-health dashboard category represented by `steipete/RepoBar`, but built as an original local-first CLI/static-dashboard tool.
+
+## What it does
+
+- scans one or more roots for git repositories
+- reports branch, dirty state, ahead/behind, last commit, and worktree count
+- merges fixture-backed GitHub metadata for CI, issues, and releases
+- renders a terminal table, JSON payload, and static HTML dashboard
+- stays local-first: no auto-pull, no background sync, no OAuth flow in v0.1
 
 ## Install
 
-```bash
-npm install -g repobeacon
-```
-
-Or run from source:
-
-```bash
+```sh
 npm install
 npm run build
-node dist/src/cli.js scan ~/Developer/my-opensource
+npm link
 ```
 
-## Examples
+Or run it directly during development:
 
-```bash
-repobeacon scan ~/Developer/my-opensource
-repobeacon scan ~/Developer/my-opensource --format json --github-fixtures tests/fixtures/github.json
-repobeacon scan ~/Developer/my-opensource --format html --output beacon.html
-repobeacon scan ~/Developer/my-opensource --sort dirty
+```sh
+npm run build
+node dist/cli.js --help
 ```
 
-## Safety model
+## Quick start
 
-- No hidden network calls.
-- No auto-sync, pull, push, or checkout.
-- GitHub data is fixture-backed in v1; pass a JSON file explicitly.
-- Commands read local Git metadata and write output only when `--output` is provided.
+```sh
+repobeacon \
+  --root ~/Developer \
+  --github-fixture fixtures/github/sample.json \
+  --html ./artifacts/dashboard.html \
+  --json-out ./artifacts/report.json
+```
 
-## Output personality
+Example table output:
 
-repobeacon shows a compact signal light for each repo: branch, dirt, ahead/behind, last commit, worktrees, CI, issues, and release freshness. It is meant to feel like a lighthouse sweep over a growing OSS harbor.
+```text
+name       branch  dirty  ahead  behind  worktrees  ci       release  score
+alpha-app  main    no     1      1       2          passing  v1.4.0   86
+beta-lib   main    yes    -      -       1          failing  v0.8.2   41
+```
+
+## CLI options
+
+- `-r, --root <path>`: scan one or more roots
+- `--max-depth <number>`: recursion depth for directory walking
+- `--include-hidden`: include dot-directories while scanning
+- `--github-fixture <file>`: load GitHub health from a local JSON fixture
+- `--format <table|json|html>`: choose stdout renderer
+- `--html <file>`: also write the HTML dashboard to disk
+- `--json-out <file>`: also write the JSON report to disk
+- `--sort <health|recent|name>`: choose sort order
+- `--limit <number>`: cap rendered rows
+- `--title <title>`: customize dashboard title
+
+## Fixtures, not live auth
+
+v0.1 deliberately uses fixture-backed GitHub metadata. That keeps the tool deterministic, testable, and safe to run offline.
+
+If you later add a fixture refresher, document it to consume `REPOBEACON_GITHUB_TOKEN` from the environment. Do not commit tokens, bake them into fixtures, or make live network access the default path.
 
 ## Development
 
-```bash
+```sh
 npm test
 npm run check
 npm run build
 npm run smoke
 bash scripts/validate.sh
 ```
+
+## Project docs
+
+- [docs/PRD.md](docs/PRD.md)
+- [docs/TASKS.md](docs/TASKS.md)
+- [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)
+- [ROADMAP.md](ROADMAP.md)
+- [CHANGELOG.md](CHANGELOG.md)
+
+## License
+
+MIT

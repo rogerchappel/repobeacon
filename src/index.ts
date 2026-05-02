@@ -1,7 +1,7 @@
-export { discoverRepos } from './discover.js';
-export { collectGit } from './git.js';
-export { loadGitHubFixtures, attachGitHubMetadata } from './github-fixtures.js';
-export { render } from './render.js';
-export { scan } from './scan.js';
-export { sortRepos } from './sort.js';
-export type { GitHubMetadata, RenderFormat, RepoBeacon, ScanOptions, SortMode } from './types.js';
+export { run, parseArgs } from './cli.js';
+export { scanRepos, findRepoRoot } from './lib/git.js';
+export { sortRepos } from './lib/sort.js';
+export { renderTable } from './renderers/table.js';
+export { renderJson } from './renderers/json.js';
+export { renderHtml } from './renderers/html.js';
+export type { RepoRecord, GithubFixtureFile, GithubRepoFixture, CliOptions } from './types.js';

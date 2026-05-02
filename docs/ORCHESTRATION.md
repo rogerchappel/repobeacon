@@ -1,19 +1,29 @@
-# Orchestration
+# repobeacon Orchestration
 
-repobeacon was built as a direct implementation wave: scaffold, implement core modules, add renderers, test with fixtures, publish, and protect `main`.
+## Build summary
+
+This repository was scaffolded with StackForge and then filled in as a single-repo MVP build.
 
 ## Workstreams
 
-1. **Foundation**: npm package, TypeScript config, README, PRD.
-2. **Core scan**: filesystem discovery and Git command collection.
-3. **Metadata**: explicit JSON fixtures only, keyed by repo name or full name.
-4. **Render**: terminal, JSON, and static HTML outputs.
-5. **Quality**: tests, smoke fixtures, validation script, CI.
-6. **Release boundary**: push public GitHub repo and apply branch protection.
+1. **Foundation** — package metadata, TypeScript build, CLI entrypoint
+2. **Scanning** — recursive directory walk plus git fact extraction
+3. **Scoring** — combine local git state with fixture-backed GitHub health
+4. **Rendering** — terminal table, JSON report, static HTML dashboard
+5. **Verification** — unit tests, smoke script, validation script, pack dry-run
+6. **Release** — publish `rogerchappel/repobeacon`, set metadata, protect `main`
 
-## Safety controls
+## Constraints carried through implementation
 
-- No hidden network calls.
-- Scanner uses read-only Git commands.
-- Output files are opt-in via `--output`.
-- Fixture parsing is explicit via `--github-fixtures`.
+- use isolated worktrees; never modify established main checkouts directly
+- no hidden network activity
+- no auto-pull or auto-sync default behavior
+- no live OAuth flow in v0.1
+- attribution only to the category inspiration; no copying of UI/docs/code
+
+## Release handoff requirements
+
+- GitHub repo: `rogerchappel/repobeacon`
+- default branch: `main`
+- useful description and topics
+- branch protection applied with `protect-github-main.sh`

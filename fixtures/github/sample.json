@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-05-02T05:00:00.000Z",
+  "repos": [
+    {
+      "repo": "alpha-app",
+      "defaultBranch": "main",
+      "ci": {
+        "status": "passing",
+        "workflow": "ci.yml",
+        "updatedAt": "2026-05-01T23:00:00.000Z"
+      },
+      "issues": {
+        "open": 3,
+        "urgent": 0
+      },
+      "release": {
+        "latestTag": "v1.4.0",
+        "publishedAt": "2026-04-21T10:00:00.000Z"
+      },
+      "stars": 42,
+      "watchers": 12,
+      "profileNote": "Solid and ready for a README screenshot."
+    },
+    {
+      "repo": "beta-lib",
+      "defaultBranch": "main",
+      "ci": {
+        "status": "failing",
+        "workflow": "ci.yml",
+        "updatedAt": "2026-05-01T20:00:00.000Z"
+      },
+      "issues": {
+        "open": 8,
+        "urgent": 2
+      },
+      "release": {
+        "latestTag": "v0.9.0",
+        "publishedAt": "2025-08-14T10:00:00.000Z"
+      },
+      "profileNote": "Needs a maintenance day."
+    }
+  ]
+}
