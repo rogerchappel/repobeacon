@@ -1,0 +1,6 @@
+{
+  "repos": {
+    "clean-repo": { "fullName": "rogerchappel/clean-repo", "ci": "passing", "openIssues": 2, "latestRelease": "v1.2.0", "releaseAgeDays": 12 },
+    "dirty-repo": { "fullName": "rogerchappel/dirty-repo", "ci": "failing", "openIssues": 7, "latestRelease": "v0.4.0", "releaseAgeDays": 45 }
+  }
+}
