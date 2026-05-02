@@ -1,0 +1,47 @@
+{
+  "name": "repobeacon",
+  "version": "0.1.0",
+  "description": "Terminal-first repo radar for local git state, fixture-backed GitHub health, and static dashboards.",
+  "type": "module",
+  "bin": {
+    "repobeacon": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "tsx --test tests/**/*.test.ts",
+    "smoke": "tsx scripts/smoke.ts"
+  },
+  "keywords": [
+    "git",
+    "github",
+    "dashboard",
+    "terminal",
+    "oss",
+    "maintainer"
+  ],
+  "author": "Roger Chappel",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rogerchappel/repobeacon.git"
+  },
+  "homepage": "https://github.com/rogerchappel/repobeacon",
+  "bugs": {
+    "url": "https://github.com/rogerchappel/repobeacon/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}
