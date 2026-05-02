@@ -15,7 +15,7 @@ Or run from source:
 ```bash
 npm install
 npm run build
-node dist/cli.js scan ~/Developer/my-opensource
+node dist/src/cli.js scan ~/Developer/my-opensource
 ```
 
 ## Examples
