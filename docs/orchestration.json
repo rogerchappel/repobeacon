@@ -1,0 +1,18 @@
+{
+  "project": "repobeacon",
+  "mode": "direct-build",
+  "workstreams": [
+    "foundation",
+    "git-scan",
+    "fixture-metadata",
+    "renderers",
+    "quality",
+    "publish"
+  ],
+  "safety": {
+    "hiddenNetwork": false,
+    "autoSync": false,
+    "writesToRepos": false,
+    "outputWritesRequireFlag": true
+  }
+}
