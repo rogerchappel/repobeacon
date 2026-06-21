@@ -33,9 +33,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:rogerchappel/repobeacon.git"
+    "url": "git+https://github.com/rogerchappel/repobeacon.git"
   },
-  "homepage": "https://github.com/rogerchappel/repobeacon",
+  "homepage": "https://github.com/rogerchappel/repobeacon#readme",
   "bugs": {
     "url": "https://github.com/rogerchappel/repobeacon/issues"
   },
