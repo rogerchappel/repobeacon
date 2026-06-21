@@ -18,8 +18,10 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check": "tsc --noEmit -p tsconfig.json",
-    "test": "tsx --test tests/**/*.test.ts",
-    "smoke": "tsx scripts/smoke.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "package:smoke": "npm run build && npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke"
   },
   "keywords": [
     "git",
@@ -33,9 +35,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:rogerchappel/repobeacon.git"
+    "url": "git+https://github.com/rogerchappel/repobeacon.git"
   },
-  "homepage": "https://github.com/rogerchappel/repobeacon",
+  "homepage": "https://github.com/rogerchappel/repobeacon#readme",
   "bugs": {
     "url": "https://github.com/rogerchappel/repobeacon/issues"
   },
