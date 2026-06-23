@@ -25,4 +25,4 @@ jobs:
         run: npm ci
 
       - name: Run release readiness checks
-        run: npm run release:check
+        run: npm run release:readiness && npm run release:check
