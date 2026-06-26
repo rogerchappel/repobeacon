@@ -65,6 +65,9 @@ v0.1 deliberately uses fixture-backed GitHub metadata. That keeps the tool deter
 
 If you later add a fixture refresher, document it to consume `REPOBEACON_GITHUB_TOKEN` from the environment. Do not commit tokens, bake them into fixtures, or make live network access the default path.
 
+See [docs/github-fixture.md](docs/github-fixture.md) for the supported fixture
+shape and refresh guidance.
+
 ## Development
 
 ```sh
@@ -88,8 +91,17 @@ the release artifact can be reviewed before publishing.
 - [docs/PRD.md](docs/PRD.md)
 - [docs/TASKS.md](docs/TASKS.md)
 - [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)
+- [docs/github-fixture.md](docs/github-fixture.md)
 - [ROADMAP.md](ROADMAP.md)
 - [CHANGELOG.md](CHANGELOG.md)
+
+## Limitations
+
+- v0.1 does not authenticate to GitHub or refresh remote metadata by itself.
+- Scores are intended for triage, not as a substitute for reviewing CI logs,
+  security alerts, or release notes.
+- Generated dashboards can reveal repository names and branch state; review the
+  HTML and JSON artifacts before publishing them.
 
 ## License
 
