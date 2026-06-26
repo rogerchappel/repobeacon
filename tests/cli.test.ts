@@ -29,3 +29,22 @@ test('cli writes html and json artifacts', () => {
   const parsed = JSON.parse(readFileSync(jsonPath, 'utf8'));
   assert.equal(parsed.repoCount, 2);
 });
+
+test('cli rejects invalid numeric and enum options before scanning', () => {
+  assert.throws(
+    () => run(['--max-depth', '0']),
+    /--max-depth must be a positive integer/
+  );
+  assert.throws(
+    () => run(['--limit', 'many']),
+    /--limit must be a positive integer/
+  );
+  assert.throws(
+    () => run(['--format', 'yaml']),
+    /--format must be one of: table, json, html/
+  );
+  assert.throws(
+    () => run(['--sort', 'stars']),
+    /--sort must be one of: health, recent, name/
+  );
+});

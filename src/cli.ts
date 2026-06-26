@@ -8,6 +8,9 @@ import { renderJson } from './renderers/json.js';
 import { renderTable } from './renderers/table.js';
 import type { CliOptions } from './types.js';
 
+const FORMATS = new Set<CliOptions['format']>(['table', 'json', 'html']);
+const SORTS = new Set<CliOptions['sortBy']>(['health', 'recent', 'name']);
+
 export function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
     roots: [process.cwd()],
@@ -26,7 +29,7 @@ export function parseArgs(argv: string[]): CliOptions {
         options.roots.push(mustValue(argv, ++index, token));
         break;
       case '--max-depth':
-        options.maxDepth = Number.parseInt(mustValue(argv, ++index, token), 10);
+        options.maxDepth = parsePositiveInteger(mustValue(argv, ++index, token), token);
         break;
       case '--include-hidden':
         options.includeHidden = true;
@@ -35,7 +38,7 @@ export function parseArgs(argv: string[]): CliOptions {
         options.fixturePath = mustValue(argv, ++index, token);
         break;
       case '--format':
-        options.format = mustValue(argv, ++index, token) as CliOptions['format'];
+        options.format = parseChoice(mustValue(argv, ++index, token), token, FORMATS);
         break;
       case '--html':
         options.htmlPath = mustValue(argv, ++index, token);
@@ -44,10 +47,10 @@ export function parseArgs(argv: string[]): CliOptions {
         options.jsonPath = mustValue(argv, ++index, token);
         break;
       case '--sort':
-        options.sortBy = mustValue(argv, ++index, token) as CliOptions['sortBy'];
+        options.sortBy = parseChoice(mustValue(argv, ++index, token), token, SORTS);
         break;
       case '--limit':
-        options.limit = Number.parseInt(mustValue(argv, ++index, token), 10);
+        options.limit = parsePositiveInteger(mustValue(argv, ++index, token), token);
         break;
       case '--title':
         options.profileTitle = mustValue(argv, ++index, token);
@@ -108,6 +111,22 @@ function mustValue(argv: string[], index: number, flag: string): string {
   }
 
   return value;
+}
+
+function parsePositiveInteger(value: string, flag: string): number {
+  if (!/^[1-9]\d*$/.test(value)) {
+    throw new Error(`${flag} must be a positive integer.`);
+  }
+
+  return Number.parseInt(value, 10);
+}
+
+function parseChoice<T extends string>(value: string, flag: string, choices: Set<T>): T {
+  if (!choices.has(value as T)) {
+    throw new Error(`${flag} must be one of: ${Array.from(choices).join(', ')}.`);
+  }
+
+  return value as T;
 }
 
 function printHelp(): void {
