@@ -10,6 +10,10 @@
     "dist",
     "README.md",
     "LICENSE",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
     "docs"
   ],
   "engines": {
