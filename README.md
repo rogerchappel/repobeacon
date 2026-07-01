@@ -84,7 +84,9 @@ bash scripts/validate.sh
 `release:readiness` validates repository metadata, package contents, package
 smoke coverage, and CI placeholder cleanup. `release:check` runs type checking,
 tests, build, the fixture-backed smoke script, and a dry-run package check so
-the release artifact can be reviewed before publishing.
+the release artifact can be reviewed before publishing. The package smoke also
+asserts that the CLI entrypoint, documentation, and sample GitHub fixture are
+included in the packed artifact.
 
 ## Project docs
 
