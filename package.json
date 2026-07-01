@@ -25,9 +25,11 @@
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "tsx --test tests/*.test.ts",
     "smoke": "tsx scripts/smoke.ts",
-    "package:smoke": "npm run build && test -f dist/cli.js && node scripts/verify-pack.mjs",
-    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
-    "release:readiness": "node scripts/validate-release-readiness.mjs"
+    "package:smoke": "npm run build && npm run bin:smoke && npm pack --dry-run",
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke",
+    "release:readiness": "node scripts/validate-release-readiness.mjs",
+    "prepack": "npm run build",
+    "bin:smoke": "node -e \"const fs=require('node:fs'); const p=require('./package.json'); const bins=typeof p.bin==='string'?{[p.name]:p.bin}:p.bin||{}; for (const [name,target] of Object.entries(bins)) { if (!fs.existsSync(target)) { console.error(name + ' bin target missing: ' + target); process.exit(1); } }\""
   },
   "keywords": [
     "git",
