@@ -23,6 +23,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check": "tsc --noEmit -p tsconfig.json",
+    "lint": "npm run check",
     "test": "tsx --test tests/*.test.ts",
     "smoke": "tsx scripts/smoke.ts",
     "package:smoke": "npm run build && npm run bin:smoke && npm pack --dry-run",
