@@ -46,6 +46,14 @@ alpha-app  main    no     1      1       2          passing  v1.4.0   86
 beta-lib   main    yes    -      -       1          failing  v0.8.2   41
 ```
 
+Run the fixture-backed local dashboard demo:
+
+```sh
+bash demo/run-local-dashboard.sh
+```
+
+That creates two temporary git repositories outside the checkout, scans them with `fixtures/github/sample.json`, and writes a table, JSON report, and static HTML dashboard under `.tmp/local-dashboard-demo/`.
+
 ## CLI options
 
 - `-r, --root <path>`: scan one or more roots
@@ -78,6 +86,7 @@ npm run smoke
 npm run release:readiness
 npm run package:smoke
 npm run release:check
+bash demo/run-local-dashboard.sh
 bash scripts/validate.sh
 ```
 
