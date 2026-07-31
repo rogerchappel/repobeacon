@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, realpathSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { scanRepos } from './lib/git.js';
 import { sortRepos } from './lib/sort.js';
@@ -133,7 +134,19 @@ function printHelp(): void {
   console.log(`repobeacon\n\nUsage:\n  repobeacon [options]\n\nOptions:\n  -r, --root <path>           scan one or more project roots\n      --max-depth <number>    recursion depth (default: 3)\n      --include-hidden        include dot-directories while scanning\n      --github-fixture <file> load GitHub health from a local fixture JSON file\n      --format <table|json|html> stdout format (default: table)\n      --html <file>           also write a static dashboard HTML file\n      --json-out <file>       also write JSON output to disk\n      --sort <health|recent|name> sorting strategy\n      --limit <number>        limit rows in the rendered output\n      --title <title>         dashboard title\n  -h, --help                  show help\n\nNotes:\n  - live GitHub auth is intentionally out of scope for v0.1\n  - set REPOBEACON_GITHUB_TOKEN later only when you wire your own fixture refresher\n`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+export function isMainEntrypoint(moduleUrl: string, argvPath: string | undefined): boolean {
+  if (!argvPath) {
+    return false;
+  }
+
+  try {
+    return realpathSync(fileURLToPath(moduleUrl)) === realpathSync(argvPath);
+  } catch {
+    return false;
+  }
+}
+
+if (isMainEntrypoint(import.meta.url, process.argv[1])) {
   try {
     const result = run(process.argv.slice(2));
     console.log(result.stdout);

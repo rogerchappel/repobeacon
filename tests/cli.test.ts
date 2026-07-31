@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
-import { run } from '../src/cli.js';
+import { isMainEntrypoint, run } from '../src/cli.js';
 import { createFixtureWorkspace } from './helpers.js';
 
 test('cli writes html and json artifacts', () => {
@@ -47,4 +48,18 @@ test('cli rejects invalid numeric and enum options before scanning', () => {
     () => run(['--sort', 'stars']),
     /--sort must be one of: health, recent, name/
   );
+});
+
+test('entrypoint detection accepts direct and symlinked npm-bin paths', () => {
+  const workspace = mkdtempSync(path.join(os.tmpdir(), 'repobeacon-entrypoint-'));
+  const entrypoint = path.join(workspace, 'cli.js');
+  const binPath = path.join(workspace, 'repobeacon');
+  writeFileSync(entrypoint, '#!/usr/bin/env node\n');
+  symlinkSync(entrypoint, binPath);
+
+  const moduleUrl = pathToFileURL(entrypoint).href;
+  assert.equal(isMainEntrypoint(moduleUrl, entrypoint), true);
+  assert.equal(isMainEntrypoint(moduleUrl, binPath), true);
+  assert.equal(isMainEntrypoint(moduleUrl, path.join(workspace, 'other.js')), false);
+  assert.equal(isMainEntrypoint(moduleUrl, undefined), false);
 });
