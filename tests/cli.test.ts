@@ -5,7 +5,7 @@ import { pathToFileURL } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
-import { isMainEntrypoint, run } from '../src/cli.js';
+import { isMainEntrypoint, parseArgs, run } from '../src/cli.js';
 import { createFixtureWorkspace } from './helpers.js';
 
 test('cli writes html and json artifacts', () => {
@@ -47,6 +47,26 @@ test('cli rejects invalid numeric and enum options before scanning', () => {
   assert.throws(
     () => run(['--sort', 'stars']),
     /--sort must be one of: health, recent, name/
+  );
+});
+
+test('cli accepts positive safe integers at the numeric option boundary', () => {
+  const boundary = String(Number.MAX_SAFE_INTEGER);
+
+  assert.equal(parseArgs(['--max-depth', boundary]).maxDepth, Number.MAX_SAFE_INTEGER);
+  assert.equal(parseArgs(['--limit', boundary]).limit, Number.MAX_SAFE_INTEGER);
+});
+
+test('cli rejects integers above the safe range with option-specific errors', () => {
+  const unsafe = String(BigInt(Number.MAX_SAFE_INTEGER) + 1n);
+
+  assert.throws(
+    () => parseArgs(['--max-depth', unsafe]),
+    /--max-depth must be a positive safe integer \(at most 9007199254740991\)/
+  );
+  assert.throws(
+    () => parseArgs(['--limit', unsafe]),
+    /--limit must be a positive safe integer \(at most 9007199254740991\)/
   );
 });
 

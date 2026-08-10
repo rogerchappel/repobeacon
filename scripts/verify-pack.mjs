@@ -16,6 +16,7 @@ const requiredFiles = [
 
 const packDirectory = mkdtempSync(path.join(os.tmpdir(), 'repobeacon-pack-'));
 const installDirectory = mkdtempSync(path.join(os.tmpdir(), 'repobeacon-install-'));
+const emptyRoot = mkdtempSync(path.join(os.tmpdir(), 'repobeacon-empty-root-'));
 
 const run = (command, args, options = {}) => spawnSync(command, args, {
   encoding: 'utf8',
@@ -68,8 +69,28 @@ try {
     }
   }
 
-  console.log(`Package manifest verified with ${packedPaths.size} files; installed bin and direct entrypoint printed help.`);
+  const safeInteger = String(Number.MAX_SAFE_INTEGER);
+  const unsafeInteger = String(BigInt(Number.MAX_SAFE_INTEGER) + 1n);
+  for (const option of ['--max-depth', '--limit']) {
+    const accepted = run(installedBin, ['--root', emptyRoot, option, safeInteger, '--format', 'json'], {
+      cwd: installDirectory,
+      env
+    });
+    if (accepted.status !== 0) {
+      process.stderr.write(`installed bin rejected the safe-integer boundary for ${option}.\n${accepted.stderr}`);
+      process.exit(accepted.status ?? 1);
+    }
+
+    const rejected = run(installedBin, [option, unsafeInteger], { cwd: installDirectory, env });
+    if (rejected.status === 0 || !rejected.stderr.includes(`${option} must be a positive safe integer`)) {
+      process.stderr.write(`installed bin did not reject the unsafe-integer boundary for ${option}.\n${rejected.stderr}`);
+      process.exit(1);
+    }
+  }
+
+  console.log(`Package manifest verified with ${packedPaths.size} files; installed CLI help and numeric boundaries passed.`);
 } finally {
   rmSync(packDirectory, { recursive: true, force: true });
   rmSync(installDirectory, { recursive: true, force: true });
+  rmSync(emptyRoot, { recursive: true, force: true });
 }
