@@ -57,14 +57,14 @@ That creates two temporary git repositories outside the checkout, scans them wit
 ## CLI options
 
 - `-r, --root <path>`: scan one or more roots
-- `--max-depth <number>`: recursion depth for directory walking
+- `--max-depth <number>`: recursion depth for directory walking (maximum: `9007199254740991`)
 - `--include-hidden`: include dot-directories while scanning
 - `--github-fixture <file>`: load GitHub health from a local JSON fixture
 - `--format <table|json|html>`: choose stdout renderer
 - `--html <file>`: also write the HTML dashboard to disk
 - `--json-out <file>`: also write the JSON report to disk
 - `--sort <health|recent|name>`: choose sort order
-- `--limit <number>`: cap rendered rows
+- `--limit <number>`: cap rendered rows (maximum: `9007199254740991`)
 - `--title <title>`: customize dashboard title
 
 ## Fixtures, not live auth
