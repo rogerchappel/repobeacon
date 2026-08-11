@@ -119,7 +119,12 @@ function parsePositiveInteger(value: string, flag: string): number {
     throw new Error(`${flag} must be a positive integer.`);
   }
 
-  return Number.parseInt(value, 10);
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error(`${flag} must be a positive safe integer (at most ${Number.MAX_SAFE_INTEGER}).`);
+  }
+
+  return parsed;
 }
 
 function parseChoice<T extends string>(value: string, flag: string, choices: Set<T>): T {
@@ -131,7 +136,7 @@ function parseChoice<T extends string>(value: string, flag: string, choices: Set
 }
 
 function printHelp(): void {
-  console.log(`repobeacon\n\nUsage:\n  repobeacon [options]\n\nOptions:\n  -r, --root <path>           scan one or more project roots\n      --max-depth <number>    recursion depth (default: 3)\n      --include-hidden        include dot-directories while scanning\n      --github-fixture <file> load GitHub health from a local fixture JSON file\n      --format <table|json|html> stdout format (default: table)\n      --html <file>           also write a static dashboard HTML file\n      --json-out <file>       also write JSON output to disk\n      --sort <health|recent|name> sorting strategy\n      --limit <number>        limit rows in the rendered output\n      --title <title>         dashboard title\n  -h, --help                  show help\n\nNotes:\n  - live GitHub auth is intentionally out of scope for v0.1\n  - set REPOBEACON_GITHUB_TOKEN later only when you wire your own fixture refresher\n`);
+  console.log(`repobeacon\n\nUsage:\n  repobeacon [options]\n\nOptions:\n  -r, --root <path>           scan one or more project roots\n      --max-depth <number>    recursion depth (default: 3; max: ${Number.MAX_SAFE_INTEGER})\n      --include-hidden        include dot-directories while scanning\n      --github-fixture <file> load GitHub health from a local fixture JSON file\n      --format <table|json|html> stdout format (default: table)\n      --html <file>           also write a static dashboard HTML file\n      --json-out <file>       also write JSON output to disk\n      --sort <health|recent|name> sorting strategy\n      --limit <number>        limit rows (max: ${Number.MAX_SAFE_INTEGER})\n      --title <title>         dashboard title\n  -h, --help                  show help\n\nNotes:\n  - live GitHub auth is intentionally out of scope for v0.1\n  - set REPOBEACON_GITHUB_TOKEN later only when you wire your own fixture refresher\n`);
 }
 
 export function isMainEntrypoint(moduleUrl: string, argvPath: string | undefined): boolean {
