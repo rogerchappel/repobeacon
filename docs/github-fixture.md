@@ -6,13 +6,14 @@ dashboard without granting the CLI live credentials.
 
 ## Shape
 
-The fixture root must contain a `repos` object keyed by repository directory
-name:
+The fixture root must contain a `repos` array. Each entry's required `repo`
+field matches a repository directory name (case-insensitively):
 
 ```json
 {
-  "repos": {
-    "alpha-app": {
+  "repos": [
+    {
+      "repo": "alpha-app",
       "ci": {
         "status": "passing",
         "url": "https://github.com/example/alpha-app/actions"
@@ -25,12 +26,14 @@ name:
         "publishedAt": "2026-05-01T00:00:00.000Z"
       }
     }
-  }
+  ]
 }
 ```
 
-All nested fields are optional. Repositories missing from the fixture still
-render with local git facts and a lower confidence score.
+The `repo` field is required and must be a non-empty string. All other entry
+fields are optional. Repositories missing from the fixture still render with
+local git facts and a lower confidence score. Invalid JSON or a fixture with
+the wrong root shape reports the fixture path and expected shape.
 
 ## Refresh Guidance
 
