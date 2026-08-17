@@ -11,6 +11,14 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node-version: '20'
+            npm-version: '10'
+          - node-version: '24'
+            npm-version: '11'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,8 +26,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: npm
+
+      - name: Select npm version
+        run: npm install --global npm@${{ matrix.npm-version }}
 
       - name: Install dependencies
         run: npm ci

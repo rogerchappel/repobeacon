@@ -33,6 +33,10 @@ if (fs.existsSync(workflowDir)) {
 
   const combined = workflowFiles.map((file) => fs.readFileSync(path.join(workflowDir, file), 'utf8')).join('\n');
   requireField(/release:check/.test(combined), 'CI workflows must run npm run release:check');
+  requireField(/node-version:\s*['"]?20['"]?/.test(combined), 'CI workflows must test Node 20');
+  requireField(/node-version:\s*['"]?24['"]?/.test(combined), 'CI workflows must test Node 24');
+  requireField(/npm-version:\s*['"]?10['"]?/.test(combined), 'CI workflows must test npm 10');
+  requireField(/npm-version:\s*['"]?11['"]?/.test(combined), 'CI workflows must test npm 11');
 }
 
 if (failures.length > 0) {
