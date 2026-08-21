@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { validateAgentsMetadata } from './validate-agents-metadata.mjs';
 
 const root = process.cwd();
 const packagePath = path.join(root, 'package.json');
@@ -15,6 +16,9 @@ requireField(packageJson.repository, 'package.json must declare repository metad
 requireField(Array.isArray(packageJson.files) && packageJson.files.length > 0, 'package.json must declare a non-empty files allowlist');
 requireField(scripts['package:smoke'], 'package.json scripts must include package:smoke');
 requireField(scripts['release:check'], 'package.json scripts must include release:check');
+
+const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
+failures.push(...validateAgentsMetadata(agents));
 
 const packageFiles = new Set(packageJson.files ?? []);
 for (const file of ['README.md', 'LICENSE', 'SECURITY.md', 'CHANGELOG.md', 'CONTRIBUTING.md']) {
