@@ -7,13 +7,14 @@ dashboard without granting the CLI live credentials.
 ## Shape
 
 The fixture root must contain a `repos` array. Each entry's required `repo`
-field matches a repository directory name (case-insensitively):
+field should be the case-insensitive GitHub `owner/repository` slug from the
+repository's `origin` remote:
 
 ```json
 {
   "repos": [
     {
-      "repo": "alpha-app",
+      "repo": "example/alpha-app",
       "ci": {
         "status": "passing",
         "url": "https://github.com/example/alpha-app/actions"
@@ -30,10 +31,20 @@ field matches a repository directory name (case-insensitively):
 }
 ```
 
-The `repo` field is required and must be a non-empty string. All other entry
-fields are optional. Repositories missing from the fixture still render with
-local git facts and a lower confidence score. Invalid JSON or a fixture with
-the wrong root shape reports the fixture path and expected shape.
+The `repo` field is required and must be a non-empty string. HTTPS and SSH
+GitHub origin URLs resolve to the same slug. Duplicate normalized fixture
+identities are rejected with the fixture path and conflicting identity.
+
+For compatibility, a basename such as `alpha-app` still matches when exactly
+one scanned repository has that basename. If multiple scanned repositories
+share a basename, basename-only entries are ignored for all of them; use an
+`owner/repository` entry for each repository instead. This prevents one entry
+from silently supplying GitHub health to unrelated repositories.
+
+All other entry fields are optional. Repositories missing from the fixture
+still render with local git facts and a lower confidence score. Invalid JSON
+or a fixture with the wrong root shape reports the fixture path and expected
+shape.
 
 ## Refresh Guidance
 
