@@ -18,11 +18,28 @@ export function loadGithubFixtures(fixturePath?: string): Map<string, GithubRepo
   }
 
   assertGithubFixtureFile(parsed, resolvedPath);
-  return new Map(parsed.repos.map((repo) => [repo.repo.toLowerCase(), repo]));
+  const fixtures = new Map<string, GithubRepoFixture>();
+  for (const repo of parsed.repos) {
+    const key = fixtureKey(repo.repo);
+    if (fixtures.has(key)) {
+      throw new Error(`Invalid GitHub fixture at ${resolvedPath}: duplicate repository identity "${repo.repo}"`);
+    }
+    fixtures.set(key, repo);
+  }
+  return fixtures;
 }
 
-export function fixtureKeyFromRepoName(name: string): string {
-  return name.toLowerCase();
+export function fixtureKey(value: string): string {
+  return value.trim().replace(/\\/g, '/').replace(/^github\.com\//i, '').replace(/\.git$/i, '').toLowerCase();
+}
+
+export function githubSlugFromRemote(remoteUrl: string | null): string | null {
+  if (!remoteUrl) {
+    return null;
+  }
+
+  const match = remoteUrl.match(/github\.com[/:]([^/]+\/[^/]+?)(?:\.git)?$/i);
+  return match?.[1] ? fixtureKey(match[1]) : null;
 }
 
 function assertGithubFixtureFile(value: unknown, fixturePath: string): asserts value is GithubFixtureFile {

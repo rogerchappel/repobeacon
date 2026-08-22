@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { scanRepos } from '../src/lib/git.js';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
@@ -36,6 +37,40 @@ test('scanRepos captures git facts and fixture-backed GitHub metadata', () => {
   assert.equal(beta.behind, null);
   assert.equal(beta.github?.ci?.status, 'failing');
   assert.ok(beta.healthScore < alpha.healthScore);
+});
+
+test('scanRepos resolves duplicate basenames by GitHub owner/repository identity', () => {
+  const firstWorkspace = createFixtureWorkspace();
+  const secondWorkspace = createFixtureWorkspace();
+  execFileSync('git', ['remote', 'set-url', 'origin', 'git@github.com:team-one/alpha-app.git'], {
+    cwd: firstWorkspace.alpha
+  });
+  execFileSync('git', ['remote', 'set-url', 'origin', 'https://github.com/team-two/alpha-app.git'], {
+    cwd: secondWorkspace.alpha
+  });
+
+  const fixturePath = path.join(firstWorkspace.root, 'duplicate-basename-fixture.json');
+  writeFileSync(fixturePath, JSON.stringify({
+    repos: [
+      { repo: 'team-one/alpha-app', issues: { open: 1 } },
+      { repo: 'team-two/alpha-app', issues: { open: 2 } },
+      { repo: 'alpha-app', issues: { open: 99 } }
+    ]
+  }), 'utf8');
+
+  const repos = scanRepos({
+    roots: [firstWorkspace.root, secondWorkspace.root],
+    maxDepth: 2,
+    includeHidden: false,
+    fixturePath,
+    now: new Date('2026-05-02T00:00:00Z')
+  });
+  const duplicateRepos = repos.filter((repo) => repo.name === 'alpha-app');
+
+  assert.equal(duplicateRepos.length, 2);
+  assert.equal(duplicateRepos.find((repo) => repo.path === firstWorkspace.alpha)?.github?.issues?.open, 1);
+  assert.equal(duplicateRepos.find((repo) => repo.path === secondWorkspace.alpha)?.github?.issues?.open, 2);
+  assert.ok(duplicateRepos.every((repo) => repo.github?.issues?.open !== 99));
 });
 
 test('the documented fixture example maps alpha-app health to a scanned repository', () => {
