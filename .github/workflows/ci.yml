@@ -19,6 +19,8 @@ jobs:
             npm-version: '10'
           - node-version: '24'
             npm-version: '11'
+          - node-version: '26'
+            npm-version: '11'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,3 +39,7 @@ jobs:
 
       - name: Run release readiness checks
         run: npm run release:readiness && npm run release:check
+
+      - name: Reject deprecated runtime loader paths
+        if: matrix.node-version == '26'
+        run: npm run test:runtime-compat
