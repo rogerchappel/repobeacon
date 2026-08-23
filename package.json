@@ -25,6 +25,7 @@
     "check": "tsc --noEmit -p tsconfig.json",
     "lint": "npm run check",
     "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
+    "test:runtime-compat": "node scripts/verify-runtime-compat.mjs",
     "smoke": "tsx scripts/smoke.ts",
     "package:smoke": "npm run build && npm run bin:smoke && node scripts/verify-pack.mjs",
     "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke",
