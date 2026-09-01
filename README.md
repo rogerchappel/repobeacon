@@ -84,6 +84,7 @@ npm run check
 npm run build
 npm run smoke
 npm run release:readiness
+npm run test:runtime-compat
 npm run package:smoke
 npm run release:check
 bash demo/run-local-dashboard.sh
@@ -92,8 +93,10 @@ bash scripts/validate.sh
 
 `release:readiness` validates repository metadata, package contents, package
 smoke coverage, and CI runtime coverage. CI verifies the declared Node.js range
-at its Node 20/npm 10 and Node 24/npm 11 endpoints, including a clean `npm ci`,
-so lockfile compatibility is checked at both boundaries. `release:check` runs type checking,
+on Node 20/npm 10, Node 24/npm 11, and Node 26/npm 11, including a clean
+`npm ci` on every runtime. The Node 26 lane also runs `test:runtime-compat` to
+guard against reintroducing the deprecated `--loader tsx` startup path.
+`release:check` runs type checking,
 tests, build, the fixture-backed smoke script, and a dry-run package check so
 the release artifact can be reviewed before publishing. The package smoke also
 asserts that the CLI entrypoint, documentation, and sample GitHub fixture are
