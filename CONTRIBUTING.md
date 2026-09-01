@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve `/Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon`.
+Thanks for helping improve `rogerchappel/repobeacon`.
 
 This project values small, reviewable contributions with clear verification.
 
@@ -9,7 +9,7 @@ This project values small, reviewable contributions with clear verification.
 Before opening an issue:
 
 - Search existing issues.
-- Confirm the issue applies to `/Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon`.
+- Confirm the issue applies to `rogerchappel/repobeacon`.
 - Include enough context for maintainers to understand or reproduce the request.
 
 Bug reports should include:
