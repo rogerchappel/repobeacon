@@ -2,7 +2,11 @@ import { relativeDaysLabel } from '../lib/time.js';
 import type { RepoRecord } from '../types.js';
 
 export function renderHtml(repos: RepoRecord[], title: string): string {
-  const strongest = repos[0];
+  const strongest = repos.reduce<RepoRecord | undefined>((best, repo) => {
+    if (!best || repo.healthScore > best.healthScore) return repo;
+    if (repo.healthScore === best.healthScore && repo.name.localeCompare(best.name) < 0) return repo;
+    return best;
+  }, undefined);
   const cards = [
     metricCard('Repos', String(repos.length)),
     metricCard('Passing CI', String(repos.filter((repo) => repo.github?.ci?.status === 'passing').length)),
