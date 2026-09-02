@@ -67,6 +67,10 @@ That creates two temporary git repositories outside the checkout, scans them wit
 - `--limit <number>`: cap rendered rows (maximum: `9007199254740991`)
 - `--title <title>`: customize dashboard title
 
+The HTML dashboard selects its **Strongest beacon** from the rendered rows by
+highest health score, regardless of `--sort`. Equal scores are resolved by
+repository name, while the table keeps the requested presentation order.
+
 ## Fixtures, not live auth
 
 v0.1 deliberately uses fixture-backed GitHub metadata. That keeps the tool deterministic, testable, and safe to run offline.
