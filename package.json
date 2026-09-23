@@ -10,7 +10,12 @@
     "dist",
     "README.md",
     "LICENSE",
-    "docs"
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "docs",
+    "fixtures"
   ],
   "engines": {
     "node": ">=20"
@@ -18,8 +23,15 @@
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "check": "tsc --noEmit -p tsconfig.json",
-    "test": "tsx --test tests/**/*.test.ts",
-    "smoke": "tsx scripts/smoke.ts"
+    "lint": "npm run check",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
+    "test:runtime-compat": "node scripts/verify-runtime-compat.mjs",
+    "smoke": "tsx scripts/smoke.ts",
+    "package:smoke": "npm run build && npm run bin:smoke && node scripts/verify-pack.mjs",
+    "release:check": "npm run check && npm test && npm run smoke && npm run package:smoke",
+    "release:readiness": "node scripts/validate-release-readiness.mjs",
+    "prepack": "npm run build",
+    "bin:smoke": "node -e \"const fs=require('node:fs'); const p=require('./package.json'); const bins=typeof p.bin==='string'?{[p.name]:p.bin}:p.bin||{}; for (const [name,target] of Object.entries(bins)) { if (!fs.existsSync(target)) { console.error(name + ' bin target missing: ' + target); process.exit(1); } }\""
   },
   "keywords": [
     "git",
@@ -33,15 +45,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:rogerchappel/repobeacon.git"
+    "url": "git+https://github.com/rogerchappel/repobeacon.git"
   },
-  "homepage": "https://github.com/rogerchappel/repobeacon",
+  "homepage": "https://github.com/rogerchappel/repobeacon#readme",
   "bugs": {
     "url": "https://github.com/rogerchappel/repobeacon/issues"
   },
   "devDependencies": {
     "@types/node": "^24.9.1",
-    "tsx": "^4.20.6",
+    "tsx": "^4.23.12",
     "typescript": "^5.9.3"
   }
 }

@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { fixtureKeyFromRepoName, loadGithubFixtures } from './github.js';
+import { fixtureKey, githubSlugFromRemote, loadGithubFixtures } from './github.js';
 import { deriveBeaconStatus, computeHealthScore } from './score.js';
 import { walkDirectories } from './fs.js';
 import { daysBetween } from './time.js';
@@ -12,6 +12,7 @@ export function scanRepos(options: RepoScanOptions): RepoRecord[] {
   const directories = walkDirectories(options.roots, options.maxDepth, options.includeHidden);
   const repos: RepoRecord[] = [];
   const seen = new Set<string>();
+  const repoRoots: string[] = [];
 
   for (const directory of directories) {
     const repoRoot = findRepoRoot(directory);
@@ -20,9 +21,22 @@ export function scanRepos(options: RepoScanOptions): RepoRecord[] {
     }
 
     seen.add(repoRoot);
+    repoRoots.push(repoRoot);
+  }
+
+  const basenameCounts = new Map<string, number>();
+  for (const repoRoot of repoRoots) {
+    const key = fixtureKey(path.basename(repoRoot));
+    basenameCounts.set(key, (basenameCounts.get(key) ?? 0) + 1);
+  }
+
+  for (const repoRoot of repoRoots) {
     const name = path.basename(repoRoot);
     const status = readRepoFacts(repoRoot);
-    const github = fixtureMap.get(fixtureKeyFromRepoName(name));
+    const basenameKey = fixtureKey(name);
+    const githubSlug = githubSlugFromRemote(status.originUrl);
+    const github = (githubSlug ? fixtureMap.get(githubSlug) : undefined)
+      ?? (basenameCounts.get(basenameKey) === 1 ? fixtureMap.get(basenameKey) : undefined);
     const lastCommitRelativeDays = daysBetween(status.lastCommitDate, options.now);
     const beaconStatus = deriveBeaconStatus(status.dirty, github);
     const healthScore = computeHealthScore({
@@ -88,8 +102,10 @@ function readRepoFacts(repoRoot: string) {
   const worktreeCount = runGit(repoRoot, ['worktree', 'list', '--porcelain'])
     .split('\n')
     .filter((line) => line.startsWith('worktree ')).length;
+  const origin = safeGit(repoRoot, ['remote', 'get-url', 'origin']);
+  const originUrl = origin.ok ? origin.stdout.trim() : null;
 
-  return { branch, dirty, ahead, behind, lastCommitSha, lastCommitDate, worktreeCount };
+  return { branch, dirty, ahead, behind, lastCommitSha, lastCommitDate, worktreeCount, originUrl };
 }
 
 function runGit(repoRoot: string, args: string[]): string {

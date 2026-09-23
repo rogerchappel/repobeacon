@@ -1,14 +1,14 @@
-# Agent Operating Instructions for /Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon
+# Agent Operating Instructions for repobeacon
 
-This file defines how AI agents and human maintainers should work in `/Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon`.
+This file defines how AI agents and human maintainers should work in `rogerchappel/repobeacon`.
 
 ## Project Context
 
-- Project: `/Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon`
-- Repository: ``
-- Primary maintainer: ``
-- Default branch: ``
-- Package manager: ``
+- Project: `repobeacon`
+- Repository: `rogerchappel/repobeacon`
+- Primary maintainer: `Roger Chappel`
+- Default branch: `main`
+- Package manager: `npm`
 - Primary verification command: `bash scripts/validate.sh`
 
 ## Core Principle
@@ -18,7 +18,7 @@ Move quickly, but keep every change reviewable, reversible, verifiable, and safe
 ## Branch Policy
 
 - Work on a branch for all repository changes.
-- Branch from the latest `` before editing.
+- Branch from the latest `main` before editing.
 - Do not merge without explicit maintainer approval.
 - Do not rewrite shared history unless explicitly instructed.
 
@@ -86,7 +86,7 @@ Every completed task must return:
 
 ```md
 ## Review Pack
-Repo: /Users/roger/Developer/my-opensource/.tmp-stackforge/repobeacon
+Repo: rogerchappel/repobeacon
 Branch:
 PR:
 Task:
@@ -172,5 +172,4 @@ Stop and ask before touching:
 Never commit secrets. Never mutate production data unless explicitly instructed.
 
 ## Repository-Specific Notes
-
 

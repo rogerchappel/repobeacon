@@ -46,24 +46,39 @@ alpha-app  main    no     1      1       2          passing  v1.4.0   86
 beta-lib   main    yes    -      -       1          failing  v0.8.2   41
 ```
 
+Run the fixture-backed local dashboard demo:
+
+```sh
+bash demo/run-local-dashboard.sh
+```
+
+That creates two temporary git repositories outside the checkout, scans them with `fixtures/github/sample.json`, and writes a table, JSON report, and static HTML dashboard under `.tmp/local-dashboard-demo/`.
+
 ## CLI options
 
 - `-r, --root <path>`: scan one or more roots
-- `--max-depth <number>`: recursion depth for directory walking
+- `--max-depth <number>`: recursion depth for directory walking (maximum: `9007199254740991`)
 - `--include-hidden`: include dot-directories while scanning
 - `--github-fixture <file>`: load GitHub health from a local JSON fixture
 - `--format <table|json|html>`: choose stdout renderer
 - `--html <file>`: also write the HTML dashboard to disk
 - `--json-out <file>`: also write the JSON report to disk
 - `--sort <health|recent|name>`: choose sort order
-- `--limit <number>`: cap rendered rows
+- `--limit <number>`: cap rendered rows (maximum: `9007199254740991`)
 - `--title <title>`: customize dashboard title
+
+The HTML dashboard selects its **Strongest beacon** from the rendered rows by
+highest health score, regardless of `--sort`. Equal scores are resolved by
+repository name, while the table keeps the requested presentation order.
 
 ## Fixtures, not live auth
 
 v0.1 deliberately uses fixture-backed GitHub metadata. That keeps the tool deterministic, testable, and safe to run offline.
 
 If you later add a fixture refresher, document it to consume `REPOBEACON_GITHUB_TOKEN` from the environment. Do not commit tokens, bake them into fixtures, or make live network access the default path.
+
+See [docs/github-fixture.md](docs/github-fixture.md) for the supported fixture
+shape and refresh guidance.
 
 ## Development
 
@@ -72,16 +87,41 @@ npm test
 npm run check
 npm run build
 npm run smoke
+npm run release:readiness
+npm run test:runtime-compat
+npm run package:smoke
+npm run release:check
+bash demo/run-local-dashboard.sh
 bash scripts/validate.sh
 ```
+
+`release:readiness` validates repository metadata, package contents, package
+smoke coverage, and CI runtime coverage. CI verifies the declared Node.js range
+on Node 20/npm 10, Node 24/npm 11, and Node 26/npm 11, including a clean
+`npm ci` on every runtime. The Node 26 lane also runs `test:runtime-compat` to
+guard against reintroducing the deprecated `--loader tsx` startup path.
+`release:check` runs type checking,
+tests, build, the fixture-backed smoke script, and a dry-run package check so
+the release artifact can be reviewed before publishing. The package smoke also
+asserts that the CLI entrypoint, documentation, and sample GitHub fixture are
+included in the packed artifact.
 
 ## Project docs
 
 - [docs/PRD.md](docs/PRD.md)
 - [docs/TASKS.md](docs/TASKS.md)
 - [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)
+- [docs/github-fixture.md](docs/github-fixture.md)
 - [ROADMAP.md](ROADMAP.md)
 - [CHANGELOG.md](CHANGELOG.md)
+
+## Limitations
+
+- v0.1 does not authenticate to GitHub or refresh remote metadata by itself.
+- Scores are intended for triage, not as a substitute for reviewing CI logs,
+  security alerts, or release notes.
+- Generated dashboards can reveal repository names and branch state; review the
+  HTML and JSON artifacts before publishing them.
 
 ## License
 

@@ -45,3 +45,30 @@ test('html renderer creates a branded dashboard', () => {
   assert.match(html, /Strongest beacon/);
   assert.match(html, /alpha-app/);
 });
+
+test('html renderer selects the strongest beacon without changing row order', () => {
+  const ordered = [
+    { ...repos[0], name: 'alpha-app', healthScore: 10 },
+    { ...repos[0], name: 'zulu-app', healthScore: 99 }
+  ];
+  const html = renderHtml(ordered, 'Beacon Board');
+
+  assert.match(html, /Strongest beacon:<\/strong><br\/>zulu-app · score 99/);
+  assert.ok(html.indexOf('<strong>alpha-app</strong>') < html.indexOf('<strong>zulu-app</strong>'));
+});
+
+test('html renderer breaks strongest-beacon ties by repository name', () => {
+  const tied = [
+    { ...repos[0], name: 'zulu-app', healthScore: 91 },
+    { ...repos[0], name: 'alpha-app', healthScore: 91 }
+  ];
+
+  assert.match(renderHtml(tied, 'Beacon Board'), /Strongest beacon:<\/strong><br\/>alpha-app · score 91/);
+});
+
+test('html renderer omits the strongest beacon feature for empty input', () => {
+  const html = renderHtml([], 'Beacon Board');
+
+  assert.doesNotMatch(html, /Strongest beacon/);
+  assert.match(html, /<div class="metric">0<\/div>/);
+});

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Include the sample GitHub fixture in the package allowlist so quickstart
+  commands work from the packed artifact.
+- Add a package manifest smoke check for required CLI, docs, and fixture files.
+
 ## 0.1.0 - 2026-05-02
 
 - initial `repobeacon` MVP

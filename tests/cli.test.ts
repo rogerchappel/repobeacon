@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
-import { run } from '../src/cli.js';
+import { isMainEntrypoint, parseArgs, run } from '../src/cli.js';
 import { createFixtureWorkspace } from './helpers.js';
 
 test('cli writes html and json artifacts', () => {
@@ -28,4 +29,57 @@ test('cli writes html and json artifacts', () => {
   assert.match(readFileSync(htmlPath, 'utf8'), /Fixture Beacon/);
   const parsed = JSON.parse(readFileSync(jsonPath, 'utf8'));
   assert.equal(parsed.repoCount, 2);
+});
+
+test('cli rejects invalid numeric and enum options before scanning', () => {
+  assert.throws(
+    () => run(['--max-depth', '0']),
+    /--max-depth must be a positive integer/
+  );
+  assert.throws(
+    () => run(['--limit', 'many']),
+    /--limit must be a positive integer/
+  );
+  assert.throws(
+    () => run(['--format', 'yaml']),
+    /--format must be one of: table, json, html/
+  );
+  assert.throws(
+    () => run(['--sort', 'stars']),
+    /--sort must be one of: health, recent, name/
+  );
+});
+
+test('cli accepts positive safe integers at the numeric option boundary', () => {
+  const boundary = String(Number.MAX_SAFE_INTEGER);
+
+  assert.equal(parseArgs(['--max-depth', boundary]).maxDepth, Number.MAX_SAFE_INTEGER);
+  assert.equal(parseArgs(['--limit', boundary]).limit, Number.MAX_SAFE_INTEGER);
+});
+
+test('cli rejects integers above the safe range with option-specific errors', () => {
+  const unsafe = String(BigInt(Number.MAX_SAFE_INTEGER) + 1n);
+
+  assert.throws(
+    () => parseArgs(['--max-depth', unsafe]),
+    /--max-depth must be a positive safe integer \(at most 9007199254740991\)/
+  );
+  assert.throws(
+    () => parseArgs(['--limit', unsafe]),
+    /--limit must be a positive safe integer \(at most 9007199254740991\)/
+  );
+});
+
+test('entrypoint detection accepts direct and symlinked npm-bin paths', () => {
+  const workspace = mkdtempSync(path.join(os.tmpdir(), 'repobeacon-entrypoint-'));
+  const entrypoint = path.join(workspace, 'cli.js');
+  const binPath = path.join(workspace, 'repobeacon');
+  writeFileSync(entrypoint, '#!/usr/bin/env node\n');
+  symlinkSync(entrypoint, binPath);
+
+  const moduleUrl = pathToFileURL(entrypoint).href;
+  assert.equal(isMainEntrypoint(moduleUrl, entrypoint), true);
+  assert.equal(isMainEntrypoint(moduleUrl, binPath), true);
+  assert.equal(isMainEntrypoint(moduleUrl, path.join(workspace, 'other.js')), false);
+  assert.equal(isMainEntrypoint(moduleUrl, undefined), false);
 });

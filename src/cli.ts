@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, realpathSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { scanRepos } from './lib/git.js';
 import { sortRepos } from './lib/sort.js';
@@ -7,6 +8,9 @@ import { renderHtml } from './renderers/html.js';
 import { renderJson } from './renderers/json.js';
 import { renderTable } from './renderers/table.js';
 import type { CliOptions } from './types.js';
+
+const FORMATS = new Set<CliOptions['format']>(['table', 'json', 'html']);
+const SORTS = new Set<CliOptions['sortBy']>(['health', 'recent', 'name']);
 
 export function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
@@ -26,7 +30,7 @@ export function parseArgs(argv: string[]): CliOptions {
         options.roots.push(mustValue(argv, ++index, token));
         break;
       case '--max-depth':
-        options.maxDepth = Number.parseInt(mustValue(argv, ++index, token), 10);
+        options.maxDepth = parsePositiveInteger(mustValue(argv, ++index, token), token);
         break;
       case '--include-hidden':
         options.includeHidden = true;
@@ -35,7 +39,7 @@ export function parseArgs(argv: string[]): CliOptions {
         options.fixturePath = mustValue(argv, ++index, token);
         break;
       case '--format':
-        options.format = mustValue(argv, ++index, token) as CliOptions['format'];
+        options.format = parseChoice(mustValue(argv, ++index, token), token, FORMATS);
         break;
       case '--html':
         options.htmlPath = mustValue(argv, ++index, token);
@@ -44,10 +48,10 @@ export function parseArgs(argv: string[]): CliOptions {
         options.jsonPath = mustValue(argv, ++index, token);
         break;
       case '--sort':
-        options.sortBy = mustValue(argv, ++index, token) as CliOptions['sortBy'];
+        options.sortBy = parseChoice(mustValue(argv, ++index, token), token, SORTS);
         break;
       case '--limit':
-        options.limit = Number.parseInt(mustValue(argv, ++index, token), 10);
+        options.limit = parsePositiveInteger(mustValue(argv, ++index, token), token);
         break;
       case '--title':
         options.profileTitle = mustValue(argv, ++index, token);
@@ -110,11 +114,44 @@ function mustValue(argv: string[], index: number, flag: string): string {
   return value;
 }
 
-function printHelp(): void {
-  console.log(`repobeacon\n\nUsage:\n  repobeacon [options]\n\nOptions:\n  -r, --root <path>           scan one or more project roots\n      --max-depth <number>    recursion depth (default: 3)\n      --include-hidden        include dot-directories while scanning\n      --github-fixture <file> load GitHub health from a local fixture JSON file\n      --format <table|json|html> stdout format (default: table)\n      --html <file>           also write a static dashboard HTML file\n      --json-out <file>       also write JSON output to disk\n      --sort <health|recent|name> sorting strategy\n      --limit <number>        limit rows in the rendered output\n      --title <title>         dashboard title\n  -h, --help                  show help\n\nNotes:\n  - live GitHub auth is intentionally out of scope for v0.1\n  - set REPOBEACON_GITHUB_TOKEN later only when you wire your own fixture refresher\n`);
+function parsePositiveInteger(value: string, flag: string): number {
+  if (!/^[1-9]\d*$/.test(value)) {
+    throw new Error(`${flag} must be a positive integer.`);
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error(`${flag} must be a positive safe integer (at most ${Number.MAX_SAFE_INTEGER}).`);
+  }
+
+  return parsed;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+function parseChoice<T extends string>(value: string, flag: string, choices: Set<T>): T {
+  if (!choices.has(value as T)) {
+    throw new Error(`${flag} must be one of: ${Array.from(choices).join(', ')}.`);
+  }
+
+  return value as T;
+}
+
+function printHelp(): void {
+  console.log(`repobeacon\n\nUsage:\n  repobeacon [options]\n\nOptions:\n  -r, --root <path>           scan one or more project roots\n      --max-depth <number>    recursion depth (default: 3; max: ${Number.MAX_SAFE_INTEGER})\n      --include-hidden        include dot-directories while scanning\n      --github-fixture <file> load GitHub health from a local fixture JSON file\n      --format <table|json|html> stdout format (default: table)\n      --html <file>           also write a static dashboard HTML file\n      --json-out <file>       also write JSON output to disk\n      --sort <health|recent|name> sorting strategy\n      --limit <number>        limit rows (max: ${Number.MAX_SAFE_INTEGER})\n      --title <title>         dashboard title\n  -h, --help                  show help\n\nNotes:\n  - live GitHub auth is intentionally out of scope for v0.1\n  - set REPOBEACON_GITHUB_TOKEN later only when you wire your own fixture refresher\n`);
+}
+
+export function isMainEntrypoint(moduleUrl: string, argvPath: string | undefined): boolean {
+  if (!argvPath) {
+    return false;
+  }
+
+  try {
+    return realpathSync(fileURLToPath(moduleUrl)) === realpathSync(argvPath);
+  } catch {
+    return false;
+  }
+}
+
+if (isMainEntrypoint(import.meta.url, process.argv[1])) {
   try {
     const result = run(process.argv.slice(2));
     console.log(result.stdout);

@@ -65,6 +65,10 @@ function createRepo(root: string, supportRoot: string, name: string, options: Re
       writeFileSync(path.join(repo, 'local.txt'), 'local change\n', 'utf8');
       commitAll(repo, '2026-05-02T00:00:00Z', 'chore: local change');
     }
+
+    run('git', ['remote', 'set-url', 'origin', `https://github.com/example/${name}.git`], repo);
+  } else {
+    run('git', ['remote', 'add', 'origin', `https://github.com/example/${name}.git`], repo);
   }
 
   if (options.extraWorktree) {
