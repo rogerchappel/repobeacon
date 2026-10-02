@@ -21,7 +21,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "build": "node scripts/build.mjs",
     "check": "tsc --noEmit -p tsconfig.json",
     "lint": "npm run check",
     "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
